@@ -1,49 +1,37 @@
 <?php
 include 'config.php';
 
-if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
-    exit;
-}
+$error_text = "";
 
-$error_text = '';
+if (isset($_POST['username']) && isset($_POST['password'])) {
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    if ($username === '' || $password === '') {
-        $error_text = 'Vul gebruikersnaam en wachtwoord in.';
+    if ($username === "" || $password === "") {
+        $error_text = "Vul alles in.";
     } else {
 
-        $sql = "
-            SELECT id, username, password, role
-            FROM users
-            WHERE username = '$username'
-            LIMIT 1
-        ";
-
+        $sql = "SELECT * FROM users WHERE username = '" . $username . "' LIMIT 1";
         $result = mysqli_query($db, $sql);
 
-        if ($result && mysqli_num_rows($result) === 1) {
-            $row = mysqli_fetch_assoc($result);
+        if ($row = mysqli_fetch_assoc($result)) {
 
-            if ($row['password'] === $password) {
+            if ($row['password'] == $password) {
 
                 $_SESSION['user_id'] = $row['id'];
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['role'] = $row['role'];
 
-                header('Location: index.php');
+                header("Location: index.php");
                 exit;
 
             } else {
-                $error_text = 'Onjuist wachtwoord.';
+                $error_text = "Wachtwoord klopt niet.";
             }
 
         } else {
-            $error_text = 'Onbekende gebruiker.';
+            $error_text = "Gebruiker bestaat niet.";
         }
     }
 }

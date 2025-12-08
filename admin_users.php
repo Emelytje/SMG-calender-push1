@@ -6,19 +6,18 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
     exit;
 }
 
-include 'header.php';
-
-$error_text = '';
-$info_text = '';
+$error_text = "";
+$info_text  = "";
 
 if (isset($_GET['delete'])) {
-    $delete_id = (int)$_GET['delete'];
+    $delete_id = $_GET['delete'];
 
-    if ($delete_id === (int)$_SESSION['user_id']) {
-        $error_text = 'Je kunt je eigen account niet verwijderen.';
+    if ($delete_id == $_SESSION['user_id']) {
+        $error_text = "Je kunt je eigen account niet verwijderen.";
     } else {
-        mysqli_query($db, "DELETE FROM users WHERE id = " . $delete_id);
-        $info_text = 'Gebruiker verwijderd.';
+        $sql_del = "DELETE FROM users WHERE id = " . $delete_id;
+        mysqli_query($db, $sql_del);
+        $info_text = "Gebruiker verwijderd.";
     }
 }
 
@@ -29,15 +28,17 @@ if ($result) {
         $user_list[] = $row;
     }
 }
+
+include 'header.php';
 ?>
 <div class="card">
     <h2>Gebruikers</h2>
 
-    <?php if ($error_text !== '') { ?>
+    <?php if ($error_text !== "") { ?>
         <div class="error"><?php echo $error_text; ?></div>
     <?php } ?>
 
-    <?php if ($info_text !== '') { ?>
+    <?php if ($info_text !== "") { ?>
         <div class="success"><?php echo $info_text; ?></div>
     <?php } ?>
 
@@ -60,13 +61,13 @@ if ($result) {
             <tr>
                 <td><?php echo $u['id']; ?></td>
                 <td><?php echo $u['username']; ?></td>
-                <td><?php echo $u['first_name'] . ' ' . $u['last_name']; ?></td>
+                <td><?php echo $u['first_name'] . " " . $u['last_name']; ?></td>
                 <td><?php echo $u['email']; ?></td>
                 <td><?php echo $u['role']; ?></td>
-                <td><?php if ($u['insured']) { echo 'Ja'; } else { echo 'Nee'; } ?></td>
+                <td><?php echo ($u['insured'] ? "Ja" : "Nee"); ?></td>
                 <td>
                     <a class="btn btn-small" href="admin_user_edit.php?id=<?php echo $u['id']; ?>">Bewerken</a>
-                    <?php if ((int)$u['id'] !== (int)$_SESSION['user_id']) { ?>
+                    <?php if ($u['id'] != $_SESSION['user_id']) { ?>
                         <a class="btn btn-small" href="admin_users.php?delete=<?php echo $u['id']; ?>" onclick="return confirm('Weet je het zeker?');">Verwijderen</a>
                     <?php } ?>
                 </td>
@@ -77,3 +78,4 @@ if ($result) {
 </div>
 <?php
 include 'footer.php';
+?>

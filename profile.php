@@ -6,39 +6,35 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$user_id = (int)$_SESSION['user_id'];
-$info = '';
-$error = '';
+$user_id = $_SESSION['user_id'];
+$info  = "";
+$error = "";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (isset($_POST['email']) || isset($_POST['phone']) || isset($_POST['first_name']) || isset($_POST['last_name'])) {
 
-    $email  = $_POST['email']      ?? '';
-    $phone  = $_POST['phone']      ?? '';
-    $first  = $_POST['first_name'] ?? '';
-    $last   = $_POST['last_name']  ?? '';
+    $email      = isset($_POST['email']) ? $_POST['email'] : "";
+    $phone      = isset($_POST['phone']) ? $_POST['phone'] : "";
+    $first_name = isset($_POST['first_name']) ? $_POST['first_name'] : "";
+    $last_name  = isset($_POST['last_name']) ? $_POST['last_name'] : "";
 
-    $sql = "
-        UPDATE users
-        SET email = '$email',
-            phone = '$phone',
-            first_name = '$first',
-            last_name = '$last'
-        WHERE id = $user_id
-    ";
+    $sql = "UPDATE users SET 
+                email = '" . $email . "',
+                phone = '" . $phone . "',
+                first_name = '" . $first_name . "',
+                last_name = '" . $last_name . "'
+            WHERE id = " . $user_id;
 
     if (mysqli_query($db, $sql)) {
-        $info = 'Gegevens opgeslagen.';
+        $info = "Gegevens opgeslagen.";
     } else {
-        $error = 'Er ging iets mis bij het opslaan.';
+        $error = "Er ging iets mis bij het opslaan.";
     }
 }
 
-$sql_user = "
-    SELECT username, email, phone, first_name, last_name
-    FROM users
-    WHERE id = $user_id
-    LIMIT 1
-";
+$sql_user = "SELECT username, email, phone, first_name, last_name 
+             FROM users 
+             WHERE id = " . $user_id . " 
+             LIMIT 1";
 $res_user = mysqli_query($db, $sql_user);
 $user = mysqli_fetch_assoc($res_user);
 
@@ -48,16 +44,15 @@ include 'header.php';
 <div class="card">
     <h2>Mijn profiel</h2>
 
-    <?php if ($info !== '') { ?>
+    <?php if ($info !== "") { ?>
         <div class="success"><?php echo $info; ?></div>
     <?php } ?>
 
-    <?php if ($error !== '') { ?>
+    <?php if ($error !== "") { ?>
         <div class="error"><?php echo $error; ?></div>
     <?php } ?>
 
     <form method="post">
-
         <label>Gebruikersnaam</label>
         <input type="text" value="<?php echo $user['username']; ?>" disabled>
 
@@ -77,4 +72,6 @@ include 'header.php';
     </form>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php
+include 'footer.php';
+?>

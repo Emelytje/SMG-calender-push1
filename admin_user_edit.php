@@ -1,28 +1,30 @@
 <?php
 include 'config.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.php');
     exit;
 }
 
-include 'header.php';
+if (isset($_GET['id'])) {
+    $user_id = $_GET['id'];
+} else {
+    $user_id = 0;
+}
 
-$user_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$is_new = ($user_id === 0);
-
+$is_new = ($user_id == 0);
 $error_text = "";
 $info_text  = "";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (isset($_POST['username'])) {
 
-    $username    = $_POST['username']    ?? '';
-    $email       = $_POST['email']       ?? '';
-    $first_name  = $_POST['first_name']  ?? '';
-    $last_name   = $_POST['last_name']   ?? '';
-    $role        = $_POST['role']        ?? 'user';
-    $insured     = isset($_POST['insured']) ? 1 : 0;
-    $password    = $_POST['password']    ?? '';
+    $username   = $_POST['username'];
+    $email      = isset($_POST['email']) ? $_POST['email'] : "";
+    $first_name = isset($_POST['first_name']) ? $_POST['first_name'] : "";
+    $last_name  = isset($_POST['last_name']) ? $_POST['last_name'] : "";
+    $role       = isset($_POST['role']) ? $_POST['role'] : "user";
+    $insured    = isset($_POST['insured']) ? 1 : 0;
+    $password   = isset($_POST['password']) ? $_POST['password'] : "";
 
     if ($username === "") {
         $error_text = "Gebruikersnaam is verplicht.";
@@ -35,59 +37,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($error_text === "") {
 
         if ($is_new) {
-            $sql = "
-                INSERT INTO users (username, email, first_name, last_name, role, insured, password)
-                VALUES (
-                    '$username',
-                    '$email',
-                    '$first_name',
-                    '$last_name',
-                    '$role',
-                    $insured,
-                    '$password'
-                )
-            ";
+            $sql = "INSERT INTO users (username, email, first_name, last_name, role, insured, password)
+                    VALUES (
+                        '" . $username . "',
+                        '" . $email . "',
+                        '" . $first_name . "',
+                        '" . $last_name . "',
+                        '" . $role . "',
+                        " . $insured . ",
+                        '" . $password . "'
+                    )";
             mysqli_query($db, $sql);
-
-            $user_id = mysqli_insert_id($db);
-            $is_new = false;
             $info_text = "Gebruiker aangemaakt.";
+            $is_new = false;
 
         } else {
-
-            $sql = "
-                UPDATE users SET
-                    username   = '$username',
-                    email      = '$email',
-                    first_name = '$first_name',
-                    last_name  = '$last_name',
-                    role       = '$role',
-                    insured    = $insured
-                WHERE id = $user_id
-            ";
+            $sql = "UPDATE users SET
+                        username = '" . $username . "',
+                        email = '" . $email . "',
+                        first_name = '" . $first_name . "',
+                        last_name = '" . $last_name . "',
+                        role = '" . $role . "',
+                        insured = " . $insured . "
+                    WHERE id = " . $user_id;
             mysqli_query($db, $sql);
-
             $info_text = "Gebruiker opgeslagen.";
         }
     }
 }
 
-$user_row = [
-    'username'   => '',
-    'email'      => '',
-    'first_name' => '',
-    'last_name'  => '',
-    'role'       => 'user',
-    'insured'    => 0
-];
+$user_row = array(
+    "username"   => "",
+    "email"      => "",
+    "first_name" => "",
+    "last_name"  => "",
+    "role"       => "user",
+    "insured"    => 0
+);
 
 if (!$is_new) {
-    $result = mysqli_query($db, "SELECT * FROM users WHERE id = $user_id LIMIT 1");
-    if ($result && mysqli_num_rows($result) === 1) {
-        $user_row = mysqli_fetch_assoc($result);
+    $sql = "SELECT * FROM users WHERE id = " . $user_id . " LIMIT 1";
+    $result = mysqli_query($db, $sql);
+    if ($result && $row = mysqli_fetch_assoc($result)) {
+        $user_row = $row;
+    } else {
+        $error_text = "Gebruiker niet gevonden.";
     }
 }
+
+include 'header.php';
 ?>
+
 <div class="card">
     <h2><?php echo $is_new ? "Nieuwe gebruiker" : "Gebruiker bewerken"; ?></h2>
 
@@ -100,7 +100,6 @@ if (!$is_new) {
     <?php } ?>
 
     <form method="post">
-
         <label for="username">Gebruikersnaam</label>
         <input type="text" id="username" name="username" value="<?php echo $user_row['username']; ?>">
 
@@ -115,7 +114,7 @@ if (!$is_new) {
 
         <label for="role">Rol</label>
         <select id="role" name="role">
-            <option value="user"  <?php if ($user_row['role'] === 'user') echo "selected"; ?>>Gebruiker</option>
+            <option value="user" <?php if ($user_row['role'] === 'user') echo "selected"; ?>>Gebruiker</option>
             <option value="admin" <?php if ($user_row['role'] === 'admin') echo "selected"; ?>>Admin</option>
         </select>
 
@@ -125,10 +124,10 @@ if (!$is_new) {
         </label>
 
         <?php if ($is_new) { ?>
-            <label for="password">Wachtwoord</label>
+            <label for="password">Wachtwoord (nieuw)</label>
             <input type="password" id="password" name="password">
         <?php } else { ?>
-            <p><em>Wachtwoord kan niet worden gewijzigd.</em></p>
+            <p><em>Wachtwoord wijzigen kan niet hier.</em></p>
         <?php } ?>
 
         <button type="submit">Opslaan</button>
@@ -136,4 +135,6 @@ if (!$is_new) {
     </form>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php
+include 'footer.php';
+?>

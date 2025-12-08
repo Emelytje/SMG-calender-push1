@@ -1,7 +1,4 @@
 <?php
-
-
-$current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
 <html lang="nl">
@@ -12,9 +9,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </head>
 <body>
 
-
-
 <div class="app-container">
+
 <?php if (isset($_SESSION['user_id'])) { ?>
     <aside class="sidebar">
         <div class="sidebar-logo">
@@ -22,22 +18,26 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <span>SMG Stables</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="index.php"<?php if ($current_page === 'index.php') { echo ' class="active"'; } ?>>Dashboard</a>
-            <a href="calendar.php"<?php if ($current_page === 'calendar.php') { echo ' class="active"'; } ?>>Kalender</a>
-            <a href="profile.php"<?php if ($current_page === 'profile.php') { echo ' class="active"'; } ?>>Mijn profiel</a>
-            <a href="change_password.php"<?php if ($current_page === 'change_password.php') { echo ' class="active"'; } ?>>Wachtwoord wijzigen</a>
+            <a href="index.php">Dashboard</a>
+            <a href="calendar.php">Kalender</a>
+            <a href="profile.php">Mijn profiel</a>
+            <a href="change_password.php">Wachtwoord wijzigen</a>
 
             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') { ?>
                 <span class="sidebar-section-title">Beheer</span>
-                <a href="admin_users.php"<?php if ($current_page === 'admin_users.php' || $current_page === 'admin_user_edit.php') { echo ' class="active"'; } ?>>Gebruikers beheren</a>
-                <a href="admin_reservations.php"<?php if ($current_page === 'admin_reservations.php') { echo ' class="active"'; } ?>>Reserveringen (per dag)</a>
-                <a href="admin_email_uninsured.php"<?php if ($current_page === 'admin_email_uninsured.php') { echo ' class="active"'; } ?>>Mail niet-verzekerden</a>
+                <a href="admin_users.php">Gebruikers beheren</a>
+                <a href="admin_reservations.php">Reserveringen (per dag)</a>
+                <a href="admin_email_uninsured.php">Mail niet-verzekerden</a>
             <?php } ?>
         </nav>
         <div class="sidebar-bottom">
             <span>
                 Ingelogd als<br>
-                <?php if (isset($_SESSION['username'])) { echo $_SESSION['username']; } ?>
+                <?php
+                if (isset($_SESSION['username'])) {
+                    echo $_SESSION['username'];
+                }
+                ?>
             </span><br>
             <a class="btn btn-small" href="logout.php">Uitloggen</a>
         </div>

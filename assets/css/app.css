@@ -1,0 +1,624 @@
+/* Sidebar basis */
+.sidebar {
+    width: 240px;
+    background: #081020; /* donkerblauw/zwart */
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
+}
+
+/* Logo */
+.sidebar-logo {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.sidebar-logo img {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+}
+
+/* Navigatie */
+.sidebar-nav ul {
+    list-style: none;          /* bolletjes weg */
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-nav li {
+    margin: 0.25rem 0;
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: 0.4rem 0.8rem;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    transition: background 0.15s, padding-left 0.15s;
+}
+
+/* Hover en active */
+.sidebar-nav a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    padding-left: 1.1rem;
+}
+
+.sidebar-nav a.active {
+    background: rgba(255, 255, 255, 0.16);
+    font-weight: 600;
+}
+
+/* "Beheer"-titel */
+.sidebar-section-title {
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #ffffff;
+}
+
+/* Onderkant (ingelogd als...) */
+.sidebar-bottom {
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    color: #ffffff;
+}
+.sidebar-bottom .btn {
+    margin-top: 0.5rem;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+    background: #f3f6fb;
+    color: #0f172a;
+}
+
+/* Layout */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: #0f172a;
+    color: #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1rem;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.sidebar-logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: 0.75rem;
+}
+
+.sidebar-logo span {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #38bdf8; 
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.sidebar-nav a {
+    padding: 0.6rem 0.9rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: #e5e7eb;
+    font-size: 0.95rem;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a:focus {
+    background: #1d4ed8;
+    color: #ffffff;
+}
+
+.sidebar-bottom {
+    border-top: 1px solid #1f2937;
+    padding-top: 1rem;
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Main content */
+.main-content {
+    flex: 1;
+    padding: 2rem 2.5rem;
+}
+
+.main-content.with-sidebar {
+    padding-left: 2.5rem;
+}
+
+.topbar h1 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    color: #0f172a;
+}
+
+/* Cards */
+.card {
+    background: #ffffff;
+    border-radius: 0.9rem;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+    margin-bottom: 1.5rem;
+}
+
+.card h2 {
+    margin-bottom: 0.75rem;
+}
+
+.card h3 {
+    margin-top: 0.75rem;
+}
+
+/* Mini cards op dashboard */
+.mini-card {
+    background:#ffffff;
+    border-radius:0.9rem;
+    padding:1rem 1.25rem;
+    box-shadow:0 10px 25px rgba(15,23,42,0.06);
+    min-width:190px;
+}
+.mini-card h3 {
+    margin-bottom:0.35rem;
+    font-size:1rem;
+}
+
+/* Buttons */
+.btn,
+button {
+    display: inline-block;
+    border-radius: 0.55rem;
+    padding: 0.55rem 1rem;
+    border: none;
+    background: #1d4ed8;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.btn:hover,
+button:hover {
+    background: #1e40af;
+}
+
+.btn-small {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+/* Forms */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 550px;
+}
+
+label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="time"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.55rem;
+    border: 1px solid #cbd5f5;
+    font-size: 0.95rem;
+    background: #ffffff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4);
+}
+
+/* Table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.55rem 0.45rem;
+    text-align: left;
+}
+
+.table th {
+    font-weight: 600;
+    background: #eff6ff;
+}
+
+/* Alerts */
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.alert-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* Content wrapper */
+.content {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* ==== Weekplanner / Google-like calendar ==== */
+
+.scheduler-card {
+    padding: 1.25rem 1.5rem 1.75rem;
+    background: #a9aef3cc;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.scheduler-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.scheduler-header h2 {
+    margin-bottom: 0.1rem;
+    font-size: 1.3rem;
+}
+
+.scheduler-header p {
+    font-size: 0.9rem;
+    color:#636cf3;
+}
+
+.scheduler-week-nav {
+    display:flex;
+    gap:0.5rem;
+}
+
+.scheduler-week-nav .btn-small {
+    background: #1a73e8;
+}
+.scheduler-week-nav .btn-small:hover {
+    background:#185abc;
+}
+
+.scheduler-month-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+    color: #5f6368;
+}
+.scheduler-month-nav span:nth-child(2) {
+    font-weight: 600;
+}
+
+/* Layout van sidebar + grid */
+.scheduler-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 1.5rem;
+    margin-top: 0.25rem;
+}
+
+/* Sidebar */
+.scheduler-sidebar {
+    background: #f8fbff;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 1px solid #e1e5f0;
+    font-size: 0.9rem;
+}
+.scheduler-sidebar h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    color: #202124;
+}
+.scheduler-sidebar input,
+.scheduler-sidebar select {
+    width: 100%;
+}
+.scheduler-list {
+    list-style:none;
+    padding-left:0;
+}
+.scheduler-list li {
+    padding:0.45rem 0;
+    border-bottom:1px solid #e5e7eb;
+    font-size:0.85rem;
+}
+
+/* Dag navigatie */
+.day-nav {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:0.85rem;
+    margin-top:0.5rem;
+    color:#1a73e8;
+}
+.day-nav a {
+    color:#1a73e8;
+    text-decoration:none;
+}
+
+/* Grid tabel */
+.scheduler-grid table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    table-layout: fixed;
+}
+.scheduler-grid thead th {
+    background: #f8fbff;
+    text-align: center;
+    padding: 0.35rem 0;
+    font-weight: 500;
+    color: #5f6368;
+    border-bottom: 1px solid #e5e7eb;
+}
+.scheduler-grid thead th.today {
+    color: #1a73e8;
+    border-bottom: 2px solid #1a73e8;
+    background: #e8f0fe;
+}
+.scheduler-grid tbody th {
+    background: #ffffff;
+    width: 60px;
+    text-align: right;
+    padding-right: 0.5rem;
+    color: #9aa0a6;
+    font-weight: 400;
+    border-right: 1px solid #e5e7eb;
+}
+.scheduler-grid td,
+.scheduler-grid th {
+    border: 0;
+}
+.scheduler-grid tbody tr {
+    border-top: 1px solid #e5e7eb;
+}
+.scheduler-cell {
+    position: relative;
+    height: 52px;
+    padding: 3px 4px;
+    vertical-align: top;
+    border-left: 1px solid #e5e7eb;
+}
+.scheduler-cell:last-child {
+    border-right:1px solid #e5e7eb;
+}
+.scheduler-cell.drop-target {
+    background:#e8f0fe;
+}
+
+/* Event blokken + kleuren */
+.reservation-block {
+    position: relative;
+    border-radius: 0.5rem;
+    padding: 2px 6px 3px 8px;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    cursor: grab;
+    max-height: 100%;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.16);
+}
+.reservation-block::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 3px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.8);
+}
+.reservation-lesson {
+    background: #ebd4da; /* licht roze */
+    color: #e28da5;
+}
+.reservation-piste {
+    background: rgb(187, 213, 231); /* licht blauw */
+    color: #7ad3ec;
+}
+.reservation-blocked {
+    background: #b9bbbf; /* licht grijs */
+    color: #7a7b7d;
+}
+.reservation-admin {
+    background: #cae8c9 !important; /* licht rood */
+    color: #75db71 !important;
+}
+.reservation-time {
+    display:block;
+    font-size:0.7rem;
+    opacity:0.95;
+}
+.reservation-block.dragging {
+    opacity:0.7;
+}
+
+/* Popup modal */
+.modal.hidden {
+    display:none;
+}
+.modal.open {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-backdrop {
+    position:absolute;
+    inset:0;
+    background:rgba(15,23,42,0.45);
+}
+.modal-dialog {
+    position:relative;
+    z-index:10;
+    background:#ffffff;
+    border-radius:0.75rem;
+    padding:1.25rem 1.5rem;
+    min-width:320px;
+    max-width:420px;
+    box-shadow:0 20px 45px rgba(15,23,42,0.4);
+}
+.modal-dialog h3 {
+    margin-bottom:0.75rem;
+    font-size:1.05rem;
+}
+.modal-dialog form {
+    max-width:100%;
+}
+.modal-actions {
+    display:flex;
+    justify-content:flex-end;
+    gap:0.5rem;
+    margin-top:1rem;
+}
+
+.calendar-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.calendar-form {
+    width: 340px;      /* linker blok (formulier) */
+    flex-shrink: 0;
+}
+
+.calendar-view {
+    flex-grow: 1;      /* rechter blok (kalender) */
+}
+
+#calendar {
+    width: 100%;
+}
+
+/* Optioneel: op kleine schermen onder elkaar zetten */
+@media (max-width: 900px) {
+    .calendar-layout {
+        flex-direction: column;
+    }
+
+    .calendar-form {
+        width: 100%;
+    }
+}
+
+/* ==== Popup eerste inlog ==== */
+#profile-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);  /* donkere waas */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#profile-popup {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+}
+
+#profile-popup h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+#profile-popup p {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
+
+#profile-popup label {
+    display: block;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+#profile-popup input {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    margin-top: 0.25rem;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+#profile-popup .popup-actions {
+    margin-top: 1rem;
+    text-align: right;
+}
+
+#profile-popup .popup-actions button {
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    cursor: pointer;
+}

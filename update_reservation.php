@@ -2,122 +2,187 @@
 include 'config.php';
 
 if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    exit;
+
+include 'header.php';
+
+if (isset($_GET['remove'])) {
+    $remove_id = (int)$_GET['remove'];
+
+    $res = mysqli_query($db, "SELECT user_id FROM reservations WHERE id = $remove_id LIMIT 1");
+    if ($res && mysqli_num_rows($res) === 1) {
+        $row = mysqli_fetch_assoc($res);
+
+        $is_owner = ($row['user_id'] == $user_id);
+        $is_admin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin');
+
+        if ($is_owner || $is_admin) {
+
+            mysqli_query($db, "
+                UPDATE reservations 
+                SET status = 'inactive' 
+                WHERE id = $remove_id
+            ");
+
+            header("Location: admin_reservations.php?date=" . urlencode($filter_date));
+            exit;
+        }
+    }
 }
 
-$raw_id = isset($_POST['id']) ? $_POST['id'] : '';
-$start  = isset($_POST['start']) ? $_POST['start'] : '';
-$end    = isset($_POST['end']) ? $_POST['end'] : '';
-
-if ($raw_id === '' || $start === '' || $end === '') {
-    exit;
-}
-
-// id begint met 'r' (reservation) of 'b' (blocked)
-$kind = substr($raw_id, 0, 1);
-$id   = (int)substr($raw_id, 1);
 
 $user_id = (int)$_SESSION['user_id'];
+$is_admin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin');
 
-$safe_start = mysqli_real_escape_string($db, $start);
-$safe_end   = mysqli_real_escape_string($db, $end);
+$filter_date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 
-if ($kind === 'b') {
-    // geblokkeerde tijd verschuiven (alleen admin)
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-        exit;
-    }
+$filter_type = isset($_GET['type']) ? $_GET['type'] : 'all';
 
-    $sql = "SELECT * FROM blocked_times WHERE id = " . $id . " LIMIT 1";
-    $res = mysqli_query($db, $sql);
-    if (!$res || mysqli_num_rows($res) === 0) {
-        exit;
-    }
-    $row = mysqli_fetch_assoc($res);
-    $track_id = (int)$row['track_id'];
+$safe_date = mysqli_real_escape_string($db, $filter_date);
 
-    // overlap met andere blokkades
-    $sql_b = "SELECT COUNT(*) AS c
-              FROM blocked_times
-              WHERE track_id = " . $track_id . "
-                AND id <> " . $id . "
-                AND NOT (end_time <= '" . $safe_start . "' OR start_time >= '" . $safe_end . "')";
-    $res_b = mysqli_query($db, $sql_b);
-    $row_b = mysqli_fetch_assoc($res_b);
-    if ((int)$row_b['c'] > 0) {
-        exit;
-    }
+$list = [];
 
-    // overlap met reserveringen
-    $sql_r = "SELECT COUNT(*) AS c
-              FROM reservations
-              WHERE track_id = " . $track_id . "
-                AND status = 'active'
-                AND NOT (end_time <= '" . $safe_start . "' OR start_time >= '" . $safe_end . "')";
-    $res_r = mysqli_query($db, $sql_r);
-    $row_r = mysqli_fetch_assoc($res_r);
-    if ((int)$row_r['c'] > 0) {
-        exit;
-    }
 
-    $sql_u = "UPDATE blocked_times
-              SET start_time = '" . $safe_start . "',
-                  end_time   = '" . $safe_end . "'
-              WHERE id = " . $id;
-    mysqli_query($db, $sql_u);
-    exit;
+
+$where = "DATE(r.start_time) = '" . $safe_date . "'";
+
+if ($filter_type === 'piste') {
+    $where .= " AND r.type = 'piste'";
+} elseif ($filter_type === 'lesson') {
+    $where .= " AND r.type = 'lesson'";
 }
 
-// anders: normale reservering
-$sql = "SELECT * FROM reservations WHERE id = " . $id . " LIMIT 1";
+$sql = "SELECT r.*,
+               t.name AS track_name,
+               u.username AS user_name,
+               i.username AS instructor_name
+        FROM reservations r
+        LEFT JOIN tracks t ON r.track_id = t.id
+        LEFT JOIN users u ON r.user_id = u.id
+        LEFT JOIN users i ON r.instructor_id = i.id
+        WHERE r.status = 'active' AND $where
+        ORDER BY r.start_time";
+
 $res = mysqli_query($db, $sql);
-if (!$res || mysqli_num_rows($res) === 0) {
-    exit;
-}
-$row = mysqli_fetch_assoc($res);
-
-$is_owner      = ((int)$row['user_id'] === $user_id);
-$is_admin      = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin');
-$is_instructor = ((int)$row['instructor_id'] === $user_id);
-
-if (!$is_owner && !$is_admin && !$is_instructor) {
-    exit;
+if ($res) {
+    while ($row = mysqli_fetch_assoc($res)) {
+        $row['kind'] = 'reservation';
+        $list[] = $row;
+    }
 }
 
-$track_id = (int)$row['track_id'];
 
-// overlap met andere reserveringen
-$sql_r2 = "SELECT COUNT(*) AS c
-           FROM reservations
-           WHERE track_id = " . $track_id . "
-             AND status = 'active'
-             AND id <> " . $id . "
-             AND NOT (end_time <= '" . $safe_start . "' OR start_time >= '" . $safe_end . "')";
-$res2 = mysqli_query($db, $sql_r2);
-$row2 = mysqli_fetch_assoc($res2);
-if ((int)$row2['c'] > 0) {
-    exit;
+if ($filter_type === 'all' || $filter_type === 'blocked') {
+
+    $sql_b = "SELECT b.*, t.name AS track_name
+              FROM blocked_times b
+              LEFT JOIN tracks t ON b.track_id = t.id
+              WHERE DATE(b.start_time) = '" . $safe_date . "'
+              ORDER BY b.start_time";
+
+    $res_b = mysqli_query($db, $sql_b);
+    if ($res_b) {
+        while ($row = mysqli_fetch_assoc($res_b)) {
+            $row['kind'] = 'blocked';
+            $list[] = $row;
+        }
+    }
 }
 
-// overlap met blokkades
-$sql_b2 = "SELECT COUNT(*) AS c
-           FROM blocked_times
-           WHERE track_id = " . $track_id . "
-             AND NOT (end_time <= '" . $safe_start . "' OR start_time >= '" . $safe_end . "')";
-$resb2 = mysqli_query($db, $sql_b2);
-$rowb2 = mysqli_fetch_assoc($resb2);
-if ((int)$rowb2['c'] > 0) {
-    exit;
-}
+usort($list, function($a, $b) {
+    return strcmp($a['start_time'], $b['start_time']);
+});
+?>
+<div class="card">
+    <h2>Reserveringen per dag</h2>
 
-$sql_upd = "UPDATE reservations
-            SET start_time = '" . $safe_start . "',
-                end_time   = '" . $safe_end . "'
-            WHERE id = " . $id;
-mysqli_query($db, $sql_upd);
+    <form method="get" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:flex-end;">
+        <div>
+            <label>Datum</label><br>
+            <input type="date" name="date" value="<?php echo $filter_date; ?>">
+        </div>
+        <div>
+            <label>Type</label><br>
+            <select name="type">
+                <option value="all"<?php if ($filter_type === 'all') echo ' selected'; ?>>Alles</option>
+                <option value="piste"<?php if ($filter_type === 'piste') echo ' selected'; ?>>Piste</option>
+                <option value="lesson"<?php if ($filter_type === 'lesson') echo ' selected'; ?>>Les</option>
+                <option value="blocked"<?php if ($filter_type === 'blocked') echo ' selected'; ?>>Geblokkeerd</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit">Filter</button>
+        </div>
+    </form>
 
-exit;
+    <?php if (count($list) === 0) { ?>
+        <p>Geen blokken gevonden voor deze dag.</p>
+    <?php } else { ?>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Tijd</th>
+                <th>Type</th>
+                <th>Piste</th>
+                <th>Ruiter</th>
+                <th>Geboekt door</th>
+                <th>Lesgever</th>
+                <th>Notitie</th>
+                <th>Acties</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($list as $row) { ?>
+
+                <tr>
+                    <td>
+                        <?php echo $row['start_time']; ?><br>
+                        <?php echo $row['end_time']; ?>
+                    </td>
+
+                    <td>
+                        <?php
+                        if ($row['kind'] === 'blocked') {
+                            echo '<span style="color:#ef4444;">Geblokkeerd</span>';
+                        } elseif ($row['type'] === 'lesson') {
+                            echo '<span style="color:#ec4899;">Les</span>';
+                        } else {
+                            echo '<span style="color:#3b82f6;">Piste</span>';
+                        }
+                        ?>
+                    </td>
+
+                    <td><?php echo $row['track_name'] ?? ''; ?></td>
+                    <td><?php echo $row['rider_name'] ?? ''; ?></td>
+                    <td><?php echo $row['user_name'] ?? ''; ?></td>
+                    <td><?php echo $row['instructor_name'] ?? ''; ?></td>
+                    <td><?php echo $row['notes'] ?? ''; ?></td>
+
+                    <td>
+                        <?php
+                        if ($is_admin) {
+                            echo '<a href="edit_reservation.php?id=' . $row['id'] . '">Bewerken</a> | ';
+                            echo '<a href="admin_reservation.php?remove=' . $row['id'] . '" onclick="return confirm(\'Weet je het zeker?\')">Verwijderen</a>';
+                        }
+
+                        else if ($row['kind'] === 'reservation' && $row['user_id'] == $user_id) {
+                            echo '<a href="edit_reservation.php?id=' . $row['id'] . '">Bewerken</a> | ';
+                            echo '<a href="admin_reservation.php?remove=' . $row['id'] . '" onclick="return confirm(\'Weet je het zeker?\')">Verwijderen</a>';
+                        }
+
+                        else {
+                            echo '-';
+                        }
+                        ?>
+                    </td>
+                </tr>
+
+            <?php } ?>
+            </tbody>
+        </table>
+    <?php } ?>
+</div>
+<?php include 'footer.php'; ?>

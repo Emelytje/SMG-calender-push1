@@ -75,7 +75,7 @@ if ($type === 'blocked') {
     }
 
     // blokkade opslaan
-    $sql = "INSERT INTO blocked_times (track_id, start_time, end_time, notes)
+    $sql = "INSERT INTO blocked_times (track_id, start_time, end_time, reason)
             VALUES (" . $track_id . ", '" . $safe_start . "', '" . $safe_end . "', '" . $safe_notes . "')";
     mysqli_query($db, $sql);
 
